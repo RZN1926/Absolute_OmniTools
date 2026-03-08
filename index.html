@@ -1679,7 +1679,7 @@
           <div class="card-title" style="margin:0">⬇️ Скачать прямо сейчас</div>
           <span class="badge" style="background:rgba(110,231,183,.12);color:var(--accent);border-color:rgba(110,231,183,.3)">через cobalt.tools</span>
         </div>
-        <div class="card-desc">YouTube, TikTok, Twitter/X, Instagram, Vimeo, SoundCloud, Twitch Clips, Dailymotion, Pinterest и ещё 20+ сайтов. Без регистрации.</div>
+        <div class="card-desc">Вставь ссылку — откроется cobalt.tools с уже подставленным URL, нажми Save и файл скачается. YouTube, TikTok, Twitter/X, Instagram, Vimeo, SoundCloud, Twitch, Dailymotion, Pinterest и ещё 20+ сайтов.</div>
 
         <div class="input-group">
           <label>Ссылка на видео / трек</label>
@@ -3392,148 +3392,64 @@ console.log(greet('World'));
 
     // ════════════════════════════ COBALT DOWNLOADER ══════════════════════════════
 
-    async function cobaltDownload() {
+    function cobaltDownload() {
       const url = document.getElementById('cb-url').value.trim();
       if (!url) { toast('Введи ссылку!'); return; }
 
-      const btn = document.getElementById('cb-btn');
-      const statusEl = document.getElementById('cb-status');
-      const statusInner = document.getElementById('cb-status-inner');
-      const pickerEl = document.getElementById('cb-picker');
-      const pickerItems = document.getElementById('cb-picker-items');
-
-      // UI: loading
-      btn.disabled = true;
-      btn.textContent = '⏳ Загружаю...';
-      statusEl.style.display = 'block';
-      statusInner.style.background = 'rgba(110,231,183,0.07)';
-      statusInner.style.border = '1px solid rgba(110,231,183,0.2)';
-      statusInner.style.color = 'var(--accent)';
-      statusInner.innerHTML = '⏳ Запрашиваю ссылку...';
-      pickerEl.style.display = 'none';
-      pickerItems.innerHTML = '';
-
-      const mode = document.getElementById('cb-mode').value;
-      const quality = document.getElementById('cb-quality').value;
-      const afmt = document.getElementById('cb-afmt').value;
-      const ytcodec = document.getElementById('cb-ytcodec').value;
+      const mode     = document.getElementById('cb-mode').value;
+      const quality  = document.getElementById('cb-quality').value;
+      const afmt     = document.getElementById('cb-afmt').value;
+      const ytcodec  = document.getElementById('cb-ytcodec').value;
       const abitrate = document.getElementById('cb-abitrate').value;
-      const filename = document.getElementById('cb-filename').value;
 
-      const body = {
-        url,
-        downloadMode: mode,
-        videoQuality: quality,
-        audioFormat: afmt === 'best' ? undefined : afmt,
-        audioBitrate: abitrate,
-        youtubeVideoCodec: ytcodec,
-        filenameStyle: filename,
-        alwaysProxy: false,
-      };
+      // Build cobalt.tools URL with settings encoded in fragment
+      // cobalt accepts: ?u=URL and reads settings from its own UI,
+      // but we can pass the URL and open the page — user clicks Save once.
+      const params = new URLSearchParams();
+      params.set('u', url);
 
-      // Remove undefined keys
-      Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+      // cobalt settings are stored in its own localStorage on cobalt.tools,
+      // so we pass everything we can via the hash state format cobalt uses:
+      // https://cobalt.tools/#url (legacy simple form still works)
+      const cobaltUrl = `https://cobalt.tools/#${encodeURIComponent(url)}`;
 
-      try {
-        const res = await fetch('https://api.cobalt.tools/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify(body),
-        });
+      const statusEl    = document.getElementById('cb-status');
+      const statusInner = document.getElementById('cb-status-inner');
+      statusEl.style.display = 'block';
+      statusInner.style.background = 'rgba(110,231,183,0.08)';
+      statusInner.style.border     = '1px solid rgba(110,231,183,0.25)';
+      statusInner.style.color      = 'var(--accent)';
 
-        const data = await res.json();
+      // Build a human-readable summary of chosen settings
+      const modeLabel = { auto:'видео + аудио', audio:'только аудио', mute:'видео без звука' }[mode] || mode;
+      const qualLabel = quality === 'max' ? 'макс. качество' : quality + 'p';
+      const afmtLabel = afmt === 'best' ? 'лучший формат' : afmt.toUpperCase();
+      const hints = [modeLabel, qualLabel, afmtLabel, `${abitrate} kbps`, `YouTube: ${ytcodec}`].join(' · ');
 
-        btn.disabled = false;
-        btn.textContent = '⬇ Скачать';
+      statusInner.innerHTML = `
+        ✅ Ссылка готова! Открываю cobalt.tools — нажми <strong>Save</strong> на открывшейся странице.<br>
+        <span style="font-size:12px;color:var(--text-muted);margin-top:4px;display:block">
+          Настройки которые ты выбрал: ${hints}<br>
+          Выставь их в cobalt вручную если нужно, или используй как есть.
+        </span>
+        <a href="${cobaltUrl}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:10px 20px;
+                  background:var(--accent);color:#000;border-radius:8px;font-weight:700;
+                  font-size:14px;text-decoration:none;transition:filter .2s"
+           onmouseover="this.style.filter='brightness(1.1)'"
+           onmouseout="this.style.filter='brightness(1)'">
+          ⬇ Открыть cobalt.tools и скачать
+        </a>`;
 
-        if (data.status === 'redirect' || data.status === 'tunnel') {
-          // Direct download
-          statusInner.style.background = 'rgba(110,231,183,0.1)';
-          statusInner.style.border = '1px solid rgba(110,231,183,0.3)';
-          statusInner.style.color = 'var(--accent)';
-          statusInner.innerHTML = `✅ Готово! Начинаю скачивание: <strong>${data.filename || 'файл'}</strong>`;
-
-          // Trigger download
-          const a = document.createElement('a');
-          a.href = data.url;
-          a.download = data.filename || 'download';
-          a.target = '_blank';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          toast('✅ Скачивание началось!');
-
-        } else if (data.status === 'picker') {
-          // Multiple items (gallery, etc.)
-          statusInner.style.background = 'rgba(96,165,250,0.08)';
-          statusInner.style.border = '1px solid rgba(96,165,250,0.2)';
-          statusInner.style.color = 'var(--accent3)';
-          statusInner.innerHTML = `📂 Найдено <strong>${data.picker.length}</strong> файлов. Выбери нужные:`;
-
-          pickerEl.style.display = 'block';
-          pickerItems.innerHTML = data.picker.map((item, i) => {
-            if (item.type === 'photo') {
-              return `<div style="position:relative;cursor:pointer" onclick="cobaltPickerDl('${item.url}','photo_${i+1}.jpg')">
-                <img src="${item.thumb || item.url}" style="width:110px;height:110px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">
-                <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.7);border-radius:4px;padding:2px 6px;font-size:11px;color:#fff">📥 ${i+1}</div>
-              </div>`;
-            } else {
-              return `<div onclick="cobaltPickerDl('${item.url}','video_${i+1}.mp4')" style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;min-width:140px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-                <div style="font-size:20px;margin-bottom:4px">🎬</div>
-                <div style="font-size:13px;font-weight:600">Видео ${i+1}</div>
-                <div style="font-size:12px;color:var(--text-muted)">Нажми для скачивания</div>
-              </div>`;
-            }
-          }).join('');
-
-          // Audio track if available
-          if (data.audio) {
-            pickerItems.innerHTML += `<div onclick="cobaltPickerDl('${data.audio}','audio.mp3')" style="cursor:pointer;background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:8px;padding:12px 16px;min-width:140px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='rgba(244,114,182,0.2)'">
-              <div style="font-size:20px;margin-bottom:4px">🎵</div>
-              <div style="font-size:13px;font-weight:600;color:var(--accent2)">Аудио</div>
-              <div style="font-size:12px;color:var(--text-muted)">Нажми для скачивания</div>
-            </div>`;
-          }
-
-        } else if (data.status === 'error') {
-          const code = data.error?.code || 'unknown';
-          const errMap = {
-            'error.api.unreachable_service': 'Сайт недоступен или ссылка устарела',
-            'error.api.link.invalid': 'Неверная ссылка — проверь URL',
-            'error.api.link.unsupported': 'Этот сайт не поддерживается',
-            'error.api.fetch.rate': 'Слишком много запросов — подожди немного',
-            'error.api.content.too_long': 'Видео слишком длинное',
-            'error.api.content.video.unavailable': 'Видео недоступно или приватное',
-            'error.api.content.post.unavailable': 'Пост недоступен или приватный',
-          };
-          const msg = errMap[code] || `Ошибка: ${code}`;
-          statusInner.style.background = 'rgba(248,113,113,0.1)';
-          statusInner.style.border = '1px solid rgba(248,113,113,0.3)';
-          statusInner.style.color = 'var(--danger)';
-          statusInner.innerHTML = `❌ ${msg}`;
-        }
-
-      } catch (err) {
-        btn.disabled = false;
-        btn.textContent = '⬇ Скачать';
-        statusInner.style.background = 'rgba(248,113,113,0.1)';
-        statusInner.style.border = '1px solid rgba(248,113,113,0.3)';
-        statusInner.style.color = 'var(--danger)';
-        statusInner.innerHTML = `❌ Не удалось подключиться к cobalt.tools. Проверь интернет или попробуй позже.`;
-      }
+      // Also auto-open
+      window.open(cobaltUrl, '_blank', 'noopener');
+      toast('🚀 Открываю cobalt.tools...');
     }
 
     function cobaltPickerDl(url, filename) {
       const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      a.href = url; a.download = filename; a.target = '_blank';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       toast('⬇️ Скачиваю...');
     }
 
