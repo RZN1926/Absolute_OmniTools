@@ -1673,125 +1673,75 @@
     <div id="download" class="section">
       <div class="section-title">Загрузчик медиа</div>
 
-      <!-- ══════════════════ COBALT DOWNLOADER ══════════════════ -->
-      <div class="card" style="border-color: var(--accent); box-shadow: 0 0 40px rgba(110,231,183,0.07)">
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+      <div class="card" style="border-color:var(--accent);box-shadow:0 0 40px rgba(110,231,183,0.06)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
           <div class="card-title" style="margin:0">⬇️ Скачать прямо сейчас</div>
-          <span class="badge" style="background:rgba(110,231,183,.12);color:var(--accent);border-color:rgba(110,231,183,.3)">через cobalt.tools</span>
+          <span id="dl-instance-badge" class="badge" style="background:rgba(110,231,183,.1);color:var(--accent);border-color:rgba(110,231,183,.25)">поиск сервера...</span>
         </div>
-        <div class="card-desc">Вставь ссылку — откроется cobalt.tools с уже подставленным URL, нажми Save и файл скачается. YouTube, TikTok, Twitter/X, Instagram, Vimeo, SoundCloud, Twitch, Dailymotion, Pinterest и ещё 20+ сайтов.</div>
+        <div class="card-desc">YouTube, TikTok, Twitter/X, Instagram, Vimeo, SoundCloud, Twitch, Reddit, Bilibili, Rutube, VK и ещё 20+ сайтов.</div>
 
         <div class="input-group">
-          <label>Ссылка на видео / трек</label>
+          <label>Ссылка</label>
           <div style="display:flex;gap:10px">
-            <input id="cb-url" placeholder="https://youtube.com/watch?v=... или любая другая поддерживаемая ссылка" style="flex:1" onkeydown="if(event.key==='Enter')cobaltDownload()">
-            <button class="btn" onclick="cobaltDownload()" id="cb-btn" style="flex-shrink:0;min-width:140px">⬇ Скачать</button>
+            <input id="dl2-url" placeholder="https://youtube.com/watch?v=..." style="flex:1"
+              onkeydown="if(event.key==='Enter')dl2Start()">
+            <button class="btn" id="dl2-btn" onclick="dl2Start()" style="flex-shrink:0;min-width:140px">⬇ Скачать</button>
           </div>
         </div>
 
         <div class="grid-3" style="margin-bottom:14px">
           <div class="input-group">
             <label>Режим</label>
-            <select id="cb-mode">
-              <option value="auto">Авто (видео + аудио)</option>
+            <select id="dl2-mode">
+              <option value="auto">Видео + аудио</option>
               <option value="audio">Только аудио</option>
-              <option value="mute">Только видео (без звука)</option>
+              <option value="mute">Видео без звука</option>
             </select>
           </div>
           <div class="input-group">
-            <label>Качество видео</label>
-            <select id="cb-quality">
+            <label>Качество</label>
+            <select id="dl2-quality">
               <option value="max">Максимальное</option>
               <option value="2160">4K (2160p)</option>
               <option value="1440">2K (1440p)</option>
-              <option value="1080" selected>Full HD (1080p)</option>
-              <option value="720">HD (720p)</option>
+              <option value="1080" selected>1080p</option>
+              <option value="720">720p</option>
               <option value="480">480p</option>
               <option value="360">360p</option>
-              <option value="240">240p</option>
-              <option value="144">144p</option>
             </select>
           </div>
           <div class="input-group">
             <label>Формат аудио</label>
-            <select id="cb-afmt">
-              <option value="best">Лучший (без конвертации)</option>
+            <select id="dl2-afmt">
+              <option value="best">Лучший</option>
               <option value="mp3">MP3</option>
-              <option value="ogg">OGG / Vorbis</option>
+              <option value="ogg">OGG</option>
               <option value="wav">WAV</option>
               <option value="opus">Opus</option>
             </select>
           </div>
         </div>
 
-        <div class="grid-3" style="margin-bottom:18px">
-          <div class="input-group">
-            <label>YouTube: видеокодек</label>
-            <select id="cb-ytcodec">
-              <option value="h264">H.264 (совместимый)</option>
-              <option value="vp9">VP9 (лучше для WebM)</option>
-              <option value="av1">AV1 (эффективный)</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label>Качество аудио (MP3)</label>
-            <select id="cb-abitrate">
-              <option value="320">320 Kbps</option>
-              <option value="256">256 Kbps</option>
-              <option value="192" selected>192 Kbps</option>
-              <option value="128">128 Kbps</option>
-              <option value="96">96 Kbps</option>
-              <option value="64">64 Kbps</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label>Имя файла</label>
-            <select id="cb-filename">
-              <option value="pretty">Красивое (название)</option>
-              <option value="classic">Классическое</option>
-              <option value="nerdy">Подробное (с ID)</option>
-              <option value="basic">Простое</option>
-            </select>
-          </div>
+        <div id="dl2-status" style="display:none;border-radius:10px;padding:16px 20px;font-size:14px;font-weight:600;line-height:1.7;margin-bottom:4px"></div>
+
+        <div id="dl2-picker" style="display:none;margin-top:12px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Выбери файл:</div>
+          <div id="dl2-picker-items" style="display:flex;flex-wrap:wrap;gap:10px"></div>
         </div>
 
-        <!-- status / result -->
-        <div id="cb-status" style="display:none;margin-bottom:16px">
-          <div id="cb-status-inner" style="padding:16px 20px;border-radius:10px;font-size:15px;font-weight:600;line-height:1.6"></div>
-        </div>
-
-        <!-- picker (Instagram gallery, etc) -->
-        <div id="cb-picker" style="display:none">
-          <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px">Выбери файл для скачивания:</div>
-          <div id="cb-picker-items" style="display:flex;flex-wrap:wrap;gap:10px"></div>
-        </div>
-
-        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-          <span style="font-size:12px;color:var(--text-muted)">Поддерживаемые сайты:</span>
-          <span id="cb-sites-row" style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--text-muted)">
-            <span class="tag" style="font-size:11px">YouTube</span>
-            <span class="tag" style="font-size:11px">TikTok</span>
-            <span class="tag" style="font-size:11px">Twitter/X</span>
-            <span class="tag" style="font-size:11px">Instagram</span>
-            <span class="tag" style="font-size:11px">Vimeo</span>
-            <span class="tag" style="font-size:11px">SoundCloud</span>
-            <span class="tag" style="font-size:11px">Twitch</span>
-            <span class="tag" style="font-size:11px">Dailymotion</span>
-            <span class="tag" style="font-size:11px">Pinterest</span>
-            <span class="tag" style="font-size:11px">Reddit</span>
-            <span class="tag" style="font-size:11px">Tumblr</span>
-            <span class="tag" style="font-size:11px">Bilibili</span>
-            <span class="tag" style="font-size:11px">Rutube</span>
-            <span class="tag" style="font-size:11px">VK</span>
-            <span class="tag" style="font-size:11px">Vine</span>
-            <span class="tag" style="font-size:11px">Streamable</span>
-            <span class="tag" style="font-size:11px">Loom</span>
-          </span>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="font-size:12px;color:var(--text-muted);margin-right:2px">Сайты:</span>
+          <span class="tag" style="font-size:11px">YouTube</span><span class="tag" style="font-size:11px">TikTok</span>
+          <span class="tag" style="font-size:11px">Twitter/X</span><span class="tag" style="font-size:11px">Instagram</span>
+          <span class="tag" style="font-size:11px">Vimeo</span><span class="tag" style="font-size:11px">SoundCloud</span>
+          <span class="tag" style="font-size:11px">Reddit</span><span class="tag" style="font-size:11px">Twitch Clips</span>
+          <span class="tag" style="font-size:11px">Bilibili</span><span class="tag" style="font-size:11px">Rutube</span>
+          <span class="tag" style="font-size:11px">VK</span><span class="tag" style="font-size:11px">Pinterest</span>
+          <span class="tag" style="font-size:11px">Dailymotion</span><span class="tag" style="font-size:11px">Tumblr</span>
         </div>
       </div>
 
-      <!-- divider -->
-      <div class="section-title" style="margin-top:32px">Генератор команд (для своего компьютера)</div>
+      <div class="section-title" style="margin-top:28px">Генератор команд</div>
 
       <!-- yt-dlp VIDEO -->
       <div class="card">
@@ -3390,71 +3340,6 @@ console.log(greet('World'));
 
     // ════════════════════════════ DOWNLOAD CMDS ══════════════════════════════
 
-    // ════════════════════════════ COBALT DOWNLOADER ══════════════════════════════
-
-    function cobaltDownload() {
-      const url = document.getElementById('cb-url').value.trim();
-      if (!url) { toast('Введи ссылку!'); return; }
-
-      const mode     = document.getElementById('cb-mode').value;
-      const quality  = document.getElementById('cb-quality').value;
-      const afmt     = document.getElementById('cb-afmt').value;
-      const ytcodec  = document.getElementById('cb-ytcodec').value;
-      const abitrate = document.getElementById('cb-abitrate').value;
-
-      // Build cobalt.tools URL with settings encoded in fragment
-      // cobalt accepts: ?u=URL and reads settings from its own UI,
-      // but we can pass the URL and open the page — user clicks Save once.
-      const params = new URLSearchParams();
-      params.set('u', url);
-
-      // cobalt settings are stored in its own localStorage on cobalt.tools,
-      // so we pass everything we can via the hash state format cobalt uses:
-      // https://cobalt.tools/#url (legacy simple form still works)
-      const cobaltUrl = `https://cobalt.tools/#${encodeURIComponent(url)}`;
-
-      const statusEl    = document.getElementById('cb-status');
-      const statusInner = document.getElementById('cb-status-inner');
-      statusEl.style.display = 'block';
-      statusInner.style.background = 'rgba(110,231,183,0.08)';
-      statusInner.style.border     = '1px solid rgba(110,231,183,0.25)';
-      statusInner.style.color      = 'var(--accent)';
-
-      // Build a human-readable summary of chosen settings
-      const modeLabel = { auto:'видео + аудио', audio:'только аудио', mute:'видео без звука' }[mode] || mode;
-      const qualLabel = quality === 'max' ? 'макс. качество' : quality + 'p';
-      const afmtLabel = afmt === 'best' ? 'лучший формат' : afmt.toUpperCase();
-      const hints = [modeLabel, qualLabel, afmtLabel, `${abitrate} kbps`, `YouTube: ${ytcodec}`].join(' · ');
-
-      statusInner.innerHTML = `
-        ✅ Ссылка готова! Открываю cobalt.tools — нажми <strong>Save</strong> на открывшейся странице.<br>
-        <span style="font-size:12px;color:var(--text-muted);margin-top:4px;display:block">
-          Настройки которые ты выбрал: ${hints}<br>
-          Выставь их в cobalt вручную если нужно, или используй как есть.
-        </span>
-        <a href="${cobaltUrl}" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:10px 20px;
-                  background:var(--accent);color:#000;border-radius:8px;font-weight:700;
-                  font-size:14px;text-decoration:none;transition:filter .2s"
-           onmouseover="this.style.filter='brightness(1.1)'"
-           onmouseout="this.style.filter='brightness(1)'">
-          ⬇ Открыть cobalt.tools и скачать
-        </a>`;
-
-      // Also auto-open
-      window.open(cobaltUrl, '_blank', 'noopener');
-      toast('🚀 Открываю cobalt.tools...');
-    }
-
-    function cobaltPickerDl(url, filename) {
-      const a = document.createElement('a');
-      a.href = url; a.download = filename; a.target = '_blank';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      toast('⬇️ Скачиваю...');
-    }
-
-
-
     function genVideo() {
       const url = document.getElementById('dlv-url').value || 'URL';
       const res = document.getElementById('dlv-res').value;
@@ -3702,6 +3587,212 @@ console.log(greet('World'));
     // legacy alias kept for any lingering references
     function genDlCmd() { genVideo(); }
 
+    // ════════════════════════════ DIRECT DOWNLOADER (cobalt instances) ══════════════
+
+    // Public cobalt-compatible instances — tried in order until one works
+    const DL_INSTANCES = [
+      'https://cobalt.api.vvf.me',
+      'https://co.wuk.sh',
+      'https://cobalt.flurl.dev',
+      'https://cobalt.urdnot.gay',
+      'https://cobalt.bato.sh',
+      'https://api.cobalt.tools',        // fallback (may need auth)
+    ];
+
+    let dl2ActiveInstance = null;
+
+    // On page load: ping instances to find a working one
+    async function dl2FindInstance() {
+      const badge = document.getElementById('dl-instance-badge');
+      for (const inst of DL_INSTANCES) {
+        try {
+          const r = await fetch(inst + '/', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            signal: AbortSignal.timeout(3000),
+          });
+          // cobalt returns {"cobalt":{...}} on GET /
+          if (r.ok) {
+            const j = await r.json().catch(() => null);
+            if (j && (j.cobalt || j.api)) {
+              dl2ActiveInstance = inst;
+              const host = new URL(inst).hostname.replace('www.','');
+              badge.textContent = '✅ ' + host;
+              badge.style.background = 'rgba(110,231,183,.12)';
+              badge.style.color = 'var(--accent)';
+              return;
+            }
+          }
+        } catch {}
+      }
+      badge.textContent = '⚠️ нет доступных серверов';
+      badge.style.background = 'rgba(251,191,36,.12)';
+      badge.style.color = '#fbbf24';
+    }
+
+    async function dl2Start() {
+      const url = document.getElementById('dl2-url').value.trim();
+      if (!url) { toast('Введи ссылку!'); return; }
+
+      const btn = document.getElementById('dl2-btn');
+      const statusEl = document.getElementById('dl2-status');
+      const pickerEl = document.getElementById('dl2-picker');
+      const pickerItems = document.getElementById('dl2-picker-items');
+
+      const setStatus = (msg, type) => {
+        statusEl.style.display = 'block';
+        const colors = {
+          loading: ['rgba(110,231,183,0.06)','rgba(110,231,183,0.2)','var(--accent)'],
+          ok:      ['rgba(110,231,183,0.1)', 'rgba(110,231,183,0.3)','var(--accent)'],
+          picker:  ['rgba(96,165,250,0.08)', 'rgba(96,165,250,0.25)','var(--accent3)'],
+          error:   ['rgba(248,113,113,0.1)', 'rgba(248,113,113,0.3)','var(--danger)'],
+        };
+        const [bg, border, color] = colors[type] || colors.loading;
+        statusEl.style.cssText += `;background:${bg};border:1px solid ${border};color:${color}`;
+        statusEl.innerHTML = msg;
+      };
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Запрос...';
+      pickerEl.style.display = 'none';
+      pickerItems.innerHTML = '';
+      setStatus('⏳ Ищу ссылку для скачивания...', 'loading');
+
+      const mode    = document.getElementById('dl2-mode').value;
+      const quality = document.getElementById('dl2-quality').value;
+      const afmt    = document.getElementById('dl2-afmt').value;
+
+      // Try instances until one succeeds
+      const instances = dl2ActiveInstance
+        ? [dl2ActiveInstance, ...DL_INSTANCES.filter(i => i !== dl2ActiveInstance)]
+        : DL_INSTANCES;
+
+      let lastErr = 'Нет доступных серверов';
+
+      for (const inst of instances) {
+        try {
+          const body = {
+            url,
+            downloadMode: mode,
+            videoQuality: quality,
+            audioFormat: afmt === 'best' ? undefined : afmt,
+            filenameStyle: 'pretty',
+          };
+          Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+          const r = await fetch(inst + '/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(body),
+            signal: AbortSignal.timeout(15000),
+          });
+
+          const data = await r.json();
+          const badge = document.getElementById('dl-instance-badge');
+          const host = new URL(inst).hostname;
+
+          if (data.status === 'redirect' || data.status === 'tunnel') {
+            dl2ActiveInstance = inst;
+            badge.textContent = '✅ ' + host;
+            badge.style.background = 'rgba(110,231,183,.12)';
+            badge.style.color = 'var(--accent)';
+
+            setStatus(`✅ Начинаю скачивание: <strong>${data.filename || 'файл'}</strong><br><span style="font-size:12px;opacity:.7">через ${host}</span>`, 'ok');
+
+            // Trigger download via blob to force save dialog
+            dl2TriggerDownload(data.url, data.filename || 'download');
+            toast('✅ Скачивание началось!');
+            break;
+
+          } else if (data.status === 'picker') {
+            dl2ActiveInstance = inst;
+            setStatus(`📂 Найдено <strong>${data.picker.length}</strong> файлов — выбери нужный:`, 'picker');
+            pickerEl.style.display = 'block';
+
+            pickerItems.innerHTML = data.picker.map((item, i) => {
+              if (item.type === 'photo') {
+                return `<div style="position:relative;cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid var(--border)"
+                  onclick="dl2TriggerDownload('${item.url}','photo_${i+1}.jpg');toast('⬇️ Скачиваю фото ${i+1}')">
+                  <img src="${item.thumb||item.url}" style="width:100px;height:100px;object-fit:cover;display:block">
+                  <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);padding:4px;font-size:11px;color:#fff;text-align:center">📥 ${i+1}</div>
+                </div>`;
+              }
+              return `<div onclick="dl2TriggerDownload('${item.url}','video_${i+1}.mp4');toast('⬇️ Скачиваю видео ${i+1}')"
+                style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+                       padding:14px 18px;min-width:130px;text-align:center;transition:border-color .2s"
+                onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="font-size:24px;margin-bottom:6px">🎬</div>
+                <div style="font-size:13px;font-weight:700">Видео ${i+1}</div>
+              </div>`;
+            }).join('');
+
+            if (data.audio) {
+              pickerItems.innerHTML += `<div onclick="dl2TriggerDownload('${data.audio}','audio.mp3');toast('⬇️ Скачиваю аудио')"
+                style="cursor:pointer;background:rgba(244,114,182,0.07);border:1px solid rgba(244,114,182,0.25);
+                       border-radius:8px;padding:14px 18px;min-width:130px;text-align:center;transition:border-color .2s"
+                onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='rgba(244,114,182,0.25)'">
+                <div style="font-size:24px;margin-bottom:6px">🎵</div>
+                <div style="font-size:13px;font-weight:700;color:var(--accent2)">Аудио</div>
+              </div>`;
+            }
+            break;
+
+          } else if (data.status === 'error') {
+            const code = data.error?.code || '';
+            if (code.includes('jwt') || code.includes('auth')) {
+              // This instance requires auth, try next
+              lastErr = code;
+              continue;
+            }
+            const errMap = {
+              'error.api.unreachable_service': 'Сайт недоступен или ссылка устарела',
+              'error.api.link.invalid':        'Неверная ссылка — проверь URL',
+              'error.api.link.unsupported':    'Этот сайт не поддерживается',
+              'error.api.fetch.rate':          'Слишком много запросов, подожди немного',
+              'error.api.content.too_long':    'Видео слишком длинное',
+              'error.api.content.video.unavailable': 'Видео недоступно или приватное',
+            };
+            lastErr = errMap[code] || code;
+            setStatus('❌ ' + lastErr, 'error');
+            break;
+          } else {
+            lastErr = JSON.stringify(data).slice(0, 80);
+            continue;
+          }
+        } catch (e) {
+          lastErr = e.message;
+          continue; // try next instance
+        }
+      }
+
+      if (statusEl.innerHTML.includes('⏳')) {
+        setStatus('❌ Все серверы недоступны: ' + lastErr, 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = '⬇ Скачать';
+    }
+
+    async function dl2TriggerDownload(url, filename) {
+      // Try fetch→blob first (forces save dialog, avoids opening in tab)
+      try {
+        const r = await fetch(url, { signal: AbortSignal.timeout(60000) });
+        if (!r.ok) throw new Error('fetch failed');
+        const blob = await r.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 5000);
+      } catch {
+        // Fallback: direct link
+        const a = document.createElement('a');
+        a.href = url; a.download = filename; a.target = '_blank';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }
+    }
+
     // ════════════════════════════ ENCODE ══════════════════════════════
 
     function b64enc() { try { setOut('b64-output', btoa(unescape(encodeURIComponent(document.getElementById('b64-input').value)))); } catch (e) { setOut('b64-output', '❌ ' + e.message); } }
@@ -3856,6 +3947,7 @@ console.log(greet('World'));
       // load md sample
       document.getElementById('md-input').value = MD_SAMPLE;
       renderMd();
+      dl2FindInstance();
       genVideo();
       genAudio();
       genFfConv();
