@@ -31,6 +31,62 @@
       --radius-sm: 8px;
     }
 
+    body.light {
+      --bg: #f4f4f8;
+      --sidebar: #ebebf0;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --border: #d8d8e8;
+      --border-hover: #aaaacc;
+      --accent: #0a7c56;
+      --accent2: #c2185b;
+      --accent3: #1565c0;
+      --text: #18182a;
+      --text-muted: #606080;
+      --danger: #d32f2f;
+      --add-bg: #e8f5e9;
+      --add-text: #1b5e20;
+      --remove-bg: #ffebee;
+      --remove-text: #b71c1c;
+    }
+
+    body.light { color-scheme: light }
+
+    body.light .cmd-block,
+    body.light .css-code { background: #f0f0f8; color: var(--accent); }
+
+    body.light .md-editor-input { background: #f9f9fd }
+
+    body.light .output-box { color: var(--accent) }
+
+    body.light select option { background: var(--surface); color: var(--text) }
+
+    body.light .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,.06) }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      margin: 10px 12px 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all .18s;
+      width: calc(100% - 24px);
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--border-hover);
+      color: var(--text);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0 }
 
     body {
@@ -827,28 +883,67 @@
     /* HOME GRID */
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
     }
 
     .tool-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 18px 20px;
       cursor: pointer;
       transition: all .22s;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::after {
+      content: '→';
+      position: absolute;
+      right: 18px;
+      font-size: 16px;
+      color: var(--border-hover);
+      transition: all .22s;
+      opacity: 0;
     }
 
     .tool-card:hover {
-      transform: translateY(-4px);
+      transform: translateX(4px);
       border-color: var(--accent);
-      box-shadow: 0 16px 40px rgba(110,231,183,.1);
+      box-shadow: 0 4px 24px rgba(110,231,183,.08);
     }
 
-    .tool-card .icon { font-size: 30px; margin-bottom: 12px; display: block }
-    .tool-card .name { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 5px }
-    .tool-card .desc { font-size: 13px; color: var(--text-muted); line-height: 1.6 }
+    .tool-card:hover::after {
+      opacity: 1;
+      color: var(--accent);
+      right: 14px;
+    }
+
+    .tool-card .icon {
+      font-size: 26px;
+      flex-shrink: 0;
+      width: 48px; height: 48px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .22s;
+    }
+
+    .tool-card:hover .icon {
+      border-color: var(--accent);
+      background: rgba(110,231,183,.08);
+    }
+
+    .tool-card .tc-body { flex: 1; min-width: 0 }
+    .tool-card .name { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 3px }
+    .tool-card .desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 
     /* SNIPPETS */
     .snippet-item {
@@ -949,6 +1044,7 @@
     <div id="server-badge" class="sidebar-badge" style="opacity:.4;padding:10px 24px">
       <span class="dot"></span><span>STATIC MODE</span>
     </div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️ Светлая тема</button>
     <nav>
       <button class="active" onclick="nav('home',this)">🏠 Главная</button>
       <div class="nav-section-label">Текст</div>
@@ -965,7 +1061,7 @@
       <button onclick="nav('encode',this)">🔐 Encode</button>
       <button onclick="nav('units',this)">📏 Единицы</button>
       <button onclick="nav('download',this)">⬇️ Загрузчик</button>
-      <button onclick="nav('snippets',this)">💾 Сниппеты</button>
+      <button onclick="nav('snippets',this)">💾 Записи</button>
     </nav>
   </aside>
 
@@ -981,53 +1077,53 @@
       </div>
       <div class="section-title">Инструменты</div>
       <div class="tools-grid">
-        <div class="tool-card" onclick="navBtn('text')"><span class="icon">📝</span>
+        <div class="tool-card" onclick="navBtn('text')"><span class="icon">📝</span><div class="tc-body">
           <div class="name">Текст</div>
-          <div class="desc">Статистика, регистр, замена, slug</div>
+          <div class="desc">Статистика, регистр, замена, slug</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('diff')"><span class="icon">🔀</span>
+        <div class="tool-card" onclick="navBtn('diff')"><span class="icon">🔀</span><div class="tc-body">
           <div class="name">Diff</div>
-          <div class="desc">Сравнение двух текстов с подсветкой</div>
+          <div class="desc">Сравнение двух текстов с подсветкой</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('md')"><span class="icon">📄</span>
+        <div class="tool-card" onclick="navBtn('md')"><span class="icon">📄</span><div class="tc-body">
           <div class="name">Markdown</div>
-          <div class="desc">Редактор с живым превью</div>
+          <div class="desc">Редактор с живым превью</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('css')"><span class="icon">🎨</span>
+        <div class="tool-card" onclick="navBtn('css')"><span class="icon">🎨</span><div class="tc-body">
           <div class="name">CSS генератор</div>
-          <div class="desc">Gradient, shadow, glassmorphism</div>
+          <div class="desc">Gradient, shadow, glassmorphism</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('convert')"><span class="icon">🔄</span>
+        <div class="tool-card" onclick="navBtn('convert')"><span class="icon">🔄</span><div class="tc-body">
           <div class="name">Конвертер</div>
-          <div class="desc">JSON↔CSV, Markdown→HTML</div>
+          <div class="desc">JSON↔CSV, Markdown→HTML</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('download')"><span class="icon">⬇️</span>
+        <div class="tool-card" onclick="navBtn('download')"><span class="icon">⬇️</span><div class="tc-body">
           <div class="name">Загрузчик</div>
-          <div class="desc">Команды для yt-dlp, spotdl</div>
+          <div class="desc">Команды для yt-dlp, spotdl</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('encode')"><span class="icon">🔐</span>
+        <div class="tool-card" onclick="navBtn('encode')"><span class="icon">🔐</span><div class="tc-body">
           <div class="name">Кодировки</div>
-          <div class="desc">Base64, URL, SHA хэши</div>
+          <div class="desc">Base64, URL, SHA хэши</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('gen')"><span class="icon">🎲</span>
+        <div class="tool-card" onclick="navBtn('gen')"><span class="icon">🎲</span><div class="tc-body">
           <div class="name">Генераторы</div>
-          <div class="desc">Пароли, UUID, Lorem Ipsum</div>
+          <div class="desc">Пароли, UUID, Lorem Ipsum</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('color')"><span class="icon">🌈</span>
+        <div class="tool-card" onclick="navBtn('color')"><span class="icon">🌈</span><div class="tc-body">
           <div class="name">Цвет</div>
-          <div class="desc">HEX↔RGB↔HSL, палитры</div>
+          <div class="desc">HEX↔RGB↔HSL, палитры</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('qr')"><span class="icon">📱</span>
+        <div class="tool-card" onclick="navBtn('qr')"><span class="icon">📱</span><div class="tc-body">
           <div class="name">QR-код</div>
-          <div class="desc">WiFi, Email, SMS, ссылки</div>
+          <div class="desc">WiFi, Email, SMS, ссылки</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('units')"><span class="icon">📏</span>
+        <div class="tool-card" onclick="navBtn('units')"><span class="icon">📏</span><div class="tc-body">
           <div class="name">Единицы</div>
-          <div class="desc">Длина, вес, температура...</div>
+          <div class="desc">Длина, вес, температура...</div></div>
         </div>
-        <div class="tool-card" onclick="navBtn('snippets')"><span class="icon">💾</span>
-          <div class="name">Сниппеты</div>
-          <div class="desc">Сохранение в localStorage</div>
+        <div class="tool-card" onclick="navBtn('snippets')"><span class="icon">💾</span><div class="tc-body">
+          <div class="name">Записи</div>
+          <div class="desc">Сохранение в localStorage</div></div>
         </div>
       </div>
     </div>
@@ -2585,12 +2681,12 @@
 
     <!-- ═══════════ SNIPPETS ═══════════ -->
     <div id="snippets" class="section">
-      <div class="section-title">Сниппеты </div>
+      <div class="section-title">Записи </div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">Новый сниппет</div>
+          <div class="card-title">Новая запись</div>
           <div class="card-desc">Сохраняется на сервере через REST API. Доступно пока сервер запущен.</div>
-          <div class="input-group"><label>Заголовок</label><input id="snip-title" placeholder="Мой сниппет"></div>
+          <div class="input-group"><label>Заголовок</label><input id="snip-title" placeholder="Моя запись"></div>
           <div class="input-group"><label>Язык</label><select id="snip-lang">
               <option>text</option>
               <option>javascript</option>
@@ -2610,7 +2706,7 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-title">Сохранённые сниппеты</div>
+          <div class="card-title">Сохранённые записи</div>
           <div id="snippets-list">
             <div style="color:var(--muted);font-size:12px">Загрузка...</div>
           </div>
@@ -2618,7 +2714,7 @@
       </div>
       <div class="card" id="snip-view" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div class="card-title" id="snip-view-title">Сниппет</div>
+          <div class="card-title" id="snip-view-title">Запись</div>
           <button class="btn-outline" onclick="closeSnipView()">✕ Закрыть</button>
         </div>
         <div class="output-box" id="snip-view-content" style="min-height:200px;font-size:12px"><button class="copy-btn"
@@ -2675,7 +2771,7 @@
       return [a, b, c, d].map(v => { let s = ''; for (let j = 0; j < 4; j++) s += ('0' + ((v >> (j * 8)) & 0xff).toString(16)).slice(-2); return s; }).join('');
     }
 
-    // ── localStorage-хранилище сниппетов ──────────────────────────
+    // ── localStorage-хранилище записей ──────────────────────────
     const SnipStore = {
       _key: 'toolbox_snippets',
       _ctr: 'toolbox_snip_ctr',
@@ -2684,7 +2780,7 @@
       _nextId() { const n = parseInt(localStorage.getItem(this._ctr) || '0') + 1; localStorage.setItem(this._ctr, n); return n.toString(36).padStart(4, '0'); },
       list() { return Object.values(this._load()).sort((a, b) => b.createdAt.localeCompare(a.createdAt)); },
       get(id) { return this._load()[id] || null; },
-      create({ title, content, language = 'text' }) { const m = this._load(); const id = this._nextId(); const now = new Date().toISOString(); const s = { id, title: title || `Сниппет ${id}`, content, language, createdAt: now, updatedAt: now }; m[id] = s; this._save(m); return s; },
+      create({ title, content, language = 'text' }) { const m = this._load(); const id = this._nextId(); const now = new Date().toISOString(); const s = { id, title: title || `Запись ${id}`, content, language, createdAt: now, updatedAt: now }; m[id] = s; this._save(m); return s; },
       update(id, data) { const m = this._load(); if (!m[id]) return null; Object.assign(m[id], data, { id, updatedAt: new Date().toISOString() }); this._save(m); return m[id]; },
       delete(id) { const m = this._load(); if (!m[id]) return false; delete m[id]; this._save(m); return true; }
     };
@@ -3592,11 +3688,12 @@ console.log(greet('World'));
     // Public cobalt-compatible instances — tried in order until one works
     const DL_INSTANCES = [
       'https://cobalt.api.vvf.me',
-      'https://co.wuk.sh',
       'https://cobalt.flurl.dev',
       'https://cobalt.urdnot.gay',
       'https://cobalt.bato.sh',
-      'https://api.cobalt.tools',        // fallback (may need auth)
+      'https://cbl.dom.taxi',
+      'https://cobalt.nadeko.net',
+      'https://cobalt.drgns.space',
     ];
 
     let dl2ActiveInstance = null;
@@ -3609,12 +3706,11 @@ console.log(greet('World'));
           const r = await fetch(inst + '/', {
             method: 'GET',
             headers: { 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(3000),
+            signal: AbortSignal.timeout(4000),
           });
-          // cobalt returns {"cobalt":{...}} on GET /
           if (r.ok) {
             const j = await r.json().catch(() => null);
-            if (j && (j.cobalt || j.api)) {
+            if (j && (j.cobalt || j.api || j.version)) {
               dl2ActiveInstance = inst;
               const host = new URL(inst).hostname.replace('www.','');
               badge.textContent = '✅ ' + host;
@@ -3673,19 +3769,31 @@ console.log(greet('World'));
         try {
           const body = {
             url,
-            downloadMode: mode,
-            videoQuality: quality,
-            audioFormat: afmt === 'best' ? undefined : afmt,
+            downloadMode: mode === 'auto' ? 'auto' : mode,
+            videoQuality: quality === 'max' ? 'max' : quality,
+            audioFormat: (afmt && afmt !== 'best') ? afmt : undefined,
             filenameStyle: 'pretty',
+            youtubeVideoCodec: 'h264',
           };
           Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
 
-          const r = await fetch(inst + '/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(body),
-            signal: AbortSignal.timeout(15000),
-          });
+          // Try new API path first (/api/json), fallback to root (/)
+          let r;
+          try {
+            r = await fetch(inst + '/api/json', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(15000),
+            });
+          } catch {
+            r = await fetch(inst + '/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(15000),
+            });
+          }
 
           const data = await r.json();
           const badge = document.getElementById('dl-instance-badge');
@@ -3893,7 +4001,7 @@ console.log(greet('World'));
     async function loadSnippets() {
       const data = SnipStore.list();
       const list = document.getElementById('snippets-list');
-      if (data.length === 0) { list.innerHTML = '<div style="color:var(--muted);font-size:12px">Нет сохранённых сниппетов</div>'; return; }
+      if (data.length === 0) { list.innerHTML = '<div style="color:var(--muted);font-size:12px">Нет сохранённых записей</div>'; return; }
       list.innerHTML = data.map(s => `
     <div class="snippet-item" onclick="viewSnippet('${s.id}')">
       <div><div class="si-title">${s.title}</div><div class="si-meta">${s.language} · ${s.content.length} симв · ${new Date(s.createdAt).toLocaleString('ru')}</div></div>
@@ -3922,15 +4030,29 @@ console.log(greet('World'));
       toast('Загружено в редактор');
     }
     async function deleteSnippet(id) {
-      if (!confirm('Удалить сниппет?')) return;
+      if (!confirm('Удалить запись?')) return;
       SnipStore.delete(id);
       toast('Удалено'); loadSnippets();
     }
     function closeSnipView() { document.getElementById('snip-view').style.display = 'none'; }
 
+    // ════════════════════════════ THEME ══════════════════════════════
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light');
+      const btn = document.getElementById('theme-btn');
+      btn.textContent = isLight ? '🌙 Тёмная тема' : '☀️ Светлая тема';
+      localStorage.setItem('tb-theme', isLight ? 'light' : 'dark');
+    }
+
     // ════════════════════════════ INIT ══════════════════════════════
 
     window.onload = () => {
+      // restore theme
+      if (localStorage.getItem('tb-theme') === 'light') {
+        document.body.classList.add('light');
+        document.getElementById('theme-btn').textContent = '🌙 Тёмная тема';
+      }
       // init all generators
       genPass();
       hexToAll();
